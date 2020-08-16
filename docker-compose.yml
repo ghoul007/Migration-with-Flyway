@@ -1,0 +1,52 @@
+version: '3.4'
+services:
+
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - postgres-log:/var/log/postgres
+    ports:
+      - "5432:5432"
+    command: postgres -c config_file=/var/lib/postgresql/data/postgresql.conf
+    restart: unless-stopped
+
+  baseline:
+    image: flyway/flyway
+    command: -url=jdbc:postgresql://postgres:5432/postgres  -user=postgres -password=postgres -connectRetries=60 baseline
+    depends_on:
+      - postgres
+
+
+  flyway:
+    image: flyway/flyway
+    command: -url=jdbc:postgresql://postgres:5432/postgres  -user=postgres -password=postgres -connectRetries=60 migrate
+    volumes:
+      - ./sqldir:/flyway/sql
+    depends_on:
+      - postgres
+      - baseline
+
+
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: tuna@infor.com
+      PGADMIN_DEFAULT_PASSWORD: tuna***tuna
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    restart: unless-stopped
+
+volumes:
+  pgadmin:
+  postgres-data:
+  postgres-log:
