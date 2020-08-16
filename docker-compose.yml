@@ -36,12 +36,12 @@ services:
 
   pgadmin:
     container_name: pgadmin
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:4.24
     environment:
       PGADMIN_DEFAULT_EMAIL: tuna@infor.com
       PGADMIN_DEFAULT_PASSWORD: tuna***tuna
-    volumes:
-      - pgadmin:/var/lib/pgadmin
+    # volumes:
+      # - pgadmin:/var/lib/pgadmin
     ports:
       - "5050:80"
     restart: unless-stopped
